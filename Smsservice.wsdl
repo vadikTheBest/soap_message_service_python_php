@@ -1,0 +1,82 @@
+<?xml version ='1.0' encoding ='UTF-8' ?>
+<wsdl:definitions 
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:tns="http://localhost/soap2/"
+             xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             targetNamespace="http://localhost/soap2/">
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://localhost/soap2/">
+            <xsd:element name="Smsservice">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="phone" type="xsd:int" minOccurs="1" maxOccurs="1" />
+                    <xsd:element name="text" type="xsd:string" minOccurs="1" maxOccurs="1" />
+                    <xsd:element name="date" type="xsd:dateTime" minOccurs="1" maxOccurs="1" />
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="sendSms">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element ref="tns:Smsservice" minOccurs="1" maxOccurs="1" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        <xsd:element name="Response">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="status" type="xsd:boolean" />
+                        <!--xsd:element ref="tns:SoapSmsGateWay" minOccurs="0" maxOccurs="unbounded"/-->
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+
+<!--Сообщения процедуры sendSms-->
+ <wsdl:message name='sendSmsRequest'>
+ <!--На вход приходит конверт с типом данных Request -->
+  <wsdl:part name='sendSms' element='tns:sendSms'/>
+ </wsdl:message>
+ <wsdl:message name='sendSmsResponse'>
+ <!--На выход конверт, содержащий тип данных Response-->
+  <wsdl:part name='Response' element='tns:Response'/>
+ </wsdl:message>
+
+<!--Привязка процедуры к сообщениям-->
+ <wsdl:portType name='SmsService'>
+  <wsdl:operation name='sendSms'>
+  <!--Входящее сообщение. От клиента к серверу-->
+   <wsdl:input message='tns:sendSmsRequest'/>  <!--Входящее сообщение. От клиента к серверу-->
+  <!--Исходящее сообщение. От сервера к клиенту-->
+
+   <wsdl:output message='tns:sendSmsResponse'/>
+  </wsdl:operation>
+ </wsdl:portType>
+
+<!--Формат процедур веб-сервиса-->
+ <wsdl:binding name='SmsServiceBinding' type='tns:SmsService'>
+ <!--Указываем протокол передачи. HTTP-->
+  <soap:binding style="document" transport='http://schemas.xmlsoap.org/soap/http'/>
+  <!--Процедура, поддерживаемая этим веб-сервисом-->
+  <wsdl:operation name="sendSms">
+  <!--Стандартный soap-конверт-->
+            <soap:operation soapAction="http://localhost/soap2/server.php" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+ </wsdl:binding>
+<!--Определение сервиса. Точка входа-->
+    <wsdl:service name='SmsService'>
+ <!--Точка входа. Отправление запросов от клиентов к серверу-->
+        <wsdl:port name='SmsServicePort' binding='tns:SmsServiceBinding'>
+  <!--Ссылка на файл-обработчик, который будет обрабатывать запросы-->
+            <soap:address location='http://soap2/server.php'/>
+        </wsdl:port>
+     </wsdl:service>
+</wsdl:definitions>
